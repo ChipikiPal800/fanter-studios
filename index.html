@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Fanter Studios | create games</title>
+  <title>Fanter Studios | create games like Scratch</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
   <style>
@@ -18,6 +18,126 @@
       background: linear-gradient(135deg, #0a0a1a, #0f0f2a, #1a0a2a);
       color: #dde2ff;
       min-height: 100vh;
+      transition: background 0.3s;
+    }
+
+    /* ===== SCRATCH THEME ===== */
+    body.scratch-theme {
+      background: #4b4b4b;
+    }
+    body.scratch-theme .header {
+      background: #ff9a00;
+      border-bottom: 4px solid #e87c00;
+    }
+    body.scratch-theme .logo {
+      color: #fff;
+      text-shadow: 2px 2px 0 #cc6600;
+    }
+    body.scratch-theme .blocks-sidebar {
+      background: #e0e0e0;
+      border-right: 2px solid #b0b0b0;
+    }
+    body.scratch-theme .block-category {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 15px;
+    }
+    body.scratch-theme .category-title {
+      color: #4a4a4a;
+      font-weight: 700;
+    }
+    body.scratch-theme .block-item {
+      background: #fff;
+      border: 2px solid #c0c0c0;
+      border-radius: 12px;
+      box-shadow: 0 2px 0 #a0a0a0;
+      color: #333;
+      font-weight: 600;
+    }
+    body.scratch-theme .block-item:hover {
+      border-color: #ff9a00;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 0 #a0a0a0;
+    }
+    body.scratch-theme .canvas-area {
+      background: #f0f0f0;
+    }
+    body.scratch-theme .canvas-toolbar {
+      background: #e0e0e0;
+      border-bottom: 2px solid #c0c0c0;
+    }
+    body.scratch-theme .tool-btn {
+      background: #fff;
+      border: 2px solid #c0c0c0;
+      color: #333;
+      font-weight: 600;
+      box-shadow: 0 2px 0 #a0a0a0;
+    }
+    body.scratch-theme .tool-btn:hover {
+      background: #ff9a00;
+      border-color: #ff9a00;
+      color: white;
+    }
+    body.scratch-theme .script-block {
+      background: #fff;
+      border: 2px solid #c0c0c0;
+      border-radius: 12px;
+      box-shadow: 0 2px 0 #a0a0a0;
+      color: #333;
+    }
+    body.scratch-theme .block-input {
+      background: #f5f5f5;
+      border: 2px solid #d0d0d0;
+      color: #333;
+    }
+    body.scratch-theme .preview-area {
+      background: #e0e0e0;
+      border-left: 2px solid #c0c0c0;
+    }
+    body.scratch-theme .game-preview {
+      background: #f5f5f5;
+      border: 2px solid #c0c0c0;
+    }
+    body.scratch-theme .preview-placeholder {
+      color: #888;
+    }
+    body.scratch-theme .test-btn {
+      background: #ff9a00;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 3px 0 #cc6600;
+    }
+    body.scratch-theme .test-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 0 #cc6600;
+    }
+    body.scratch-theme .game-card {
+      background: #fff;
+      border: 2px solid #c0c0c0;
+      color: #333;
+    }
+    body.scratch-theme .game-card h3 {
+      color: #ff9a00;
+    }
+    body.scratch-theme .modal-content {
+      background: #fff;
+      border: 3px solid #ff9a00;
+      color: #333;
+    }
+    body.scratch-theme .modal-content h3 {
+      color: #ff9a00;
+    }
+    body.scratch-theme .modal-content input,
+    body.scratch-theme .modal-content textarea {
+      background: #f5f5f5;
+      border: 2px solid #d0d0d0;
+      color: #333;
+    }
+    body.scratch-theme .user-coins {
+      background: #fff;
+      border: 2px solid #ff9a00;
+      color: #ff9a00;
     }
 
     /* BETA RIBBON */
@@ -42,7 +162,7 @@
 
     /* HEADER */
     .header {
-      padding: 15px 25px;
+      padding: 12px 25px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -52,6 +172,7 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      transition: all 0.3s;
     }
     .logo {
       font-family: 'Syne', sans-serif;
@@ -89,6 +210,20 @@
       background: rgba(45, 90, 227, 0.3);
       color: #ffcc00;
     }
+    .theme-switch {
+      background: rgba(0,0,0,0.3);
+      border: none;
+      border-radius: 30px;
+      padding: 5px 12px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .theme-switch:hover {
+      background: rgba(255,204,0,0.3);
+      color: #ffcc00;
+    }
     .user-info {
       display: flex;
       align-items: center;
@@ -119,53 +254,64 @@
       height: calc(100vh - 65px);
     }
 
-    /* BLOCKS SIDEBAR */
+    /* BLOCKS SIDEBAR - Scratch style */
     .blocks-sidebar {
-      width: 260px;
+      width: 280px;
       background: rgba(10, 15, 30, 0.9);
       border-right: 1px solid rgba(45, 90, 227, 0.3);
       padding: 15px;
       overflow-y: auto;
+      transition: all 0.3s;
     }
     .block-category {
       margin-bottom: 20px;
     }
     .category-title {
-      font-size: 10px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
-      color: rgba(255,255,255,0.4);
+      color: #ffcc00;
       margin-bottom: 10px;
+      padding-bottom: 4px;
+      border-bottom: 2px solid rgba(255,204,0,0.3);
     }
     .block-item {
-      background: rgba(20, 30, 50, 0.8);
-      border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 8px;
-      padding: 8px 10px;
-      margin-bottom: 6px;
+      background: rgba(30, 45, 70, 0.9);
+      border: 2px solid rgba(45, 90, 227, 0.4);
+      border-radius: 12px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
       cursor: grab;
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      transition: all 0.2s;
+      gap: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
+      position: relative;
+    }
+    .block-item:active {
+      cursor: grabbing;
     }
     .block-item:hover {
       border-color: #ffcc00;
-      transform: translateX(3px);
-      background: rgba(45, 90, 227, 0.2);
+      transform: translateX(4px) translateY(-2px);
+      background: rgba(45, 90, 227, 0.3);
     }
     .block-icon {
-      font-size: 16px;
+      font-size: 20px;
+      width: 28px;
+      text-align: center;
     }
 
-    /* CANVAS */
+    /* CANVAS - Scratch workspace */
     .canvas-area {
       flex: 1;
       display: flex;
       flex-direction: column;
       background: rgba(5, 7, 15, 0.3);
+      transition: all 0.3s;
     }
     .canvas-toolbar {
       padding: 10px 15px;
@@ -173,20 +319,22 @@
       display: flex;
       gap: 10px;
       background: rgba(10, 15, 30, 0.6);
+      flex-wrap: wrap;
     }
     .tool-btn {
-      background: rgba(255,255,255,0.05);
+      background: rgba(255,255,255,0.08);
       border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 6px;
-      padding: 6px 14px;
+      border-radius: 8px;
+      padding: 8px 16px;
       color: white;
       cursor: pointer;
-      font-size: 12px;
-      transition: all 0.2s;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.15s;
     }
     .tool-btn:hover {
       border-color: #ffcc00;
-      transform: translateY(-1px);
+      transform: translateY(-2px);
     }
     .tool-btn.primary {
       background: linear-gradient(135deg, #2d5ae3, #1a3bc0);
@@ -195,61 +343,84 @@
     .canvas {
       flex: 1;
       overflow-y: auto;
-      padding: 15px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
+    /* Scratch-style script blocks */
     .script-block {
-      background: rgba(20, 30, 50, 0.9);
-      border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 10px;
-      padding: 10px 12px;
+      background: rgba(35, 50, 75, 0.95);
+      border: 2px solid rgba(45, 90, 227, 0.5);
+      border-radius: 16px;
+      padding: 12px 16px;
       display: flex;
       align-items: center;
-      gap: 10px;
-      transition: all 0.2s;
+      gap: 12px;
+      transition: all 0.15s;
       position: relative;
+      cursor: move;
     }
     .script-block:hover {
       border-color: #ffcc00;
-      transform: translateX(3px);
+      transform: translateX(5px);
     }
     .block-drag-handle {
       cursor: grab;
-      color: rgba(255,255,255,0.3);
-      font-size: 14px;
+      color: rgba(255,255,255,0.4);
+      font-size: 18px;
+    }
+    .block-drag-handle:active {
+      cursor: grabbing;
     }
     .block-content {
       flex: 1;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       flex-wrap: wrap;
+      font-weight: 500;
     }
     .block-input {
       background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 5px;
-      padding: 4px 8px;
+      border: 1px solid rgba(45, 90, 227, 0.5);
+      border-radius: 20px;
+      padding: 6px 12px;
       color: white;
-      width: 70px;
-      font-size: 11px;
+      width: 90px;
+      font-size: 12px;
+      text-align: center;
+    }
+    .block-input:focus {
+      outline: none;
+      border-color: #ffcc00;
+    }
+    .block-select {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(45, 90, 227, 0.5);
+      border-radius: 20px;
+      padding: 6px 12px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
     }
     .block-delete {
       background: none;
       border: none;
       color: rgba(255,255,255,0.3);
       cursor: pointer;
-      font-size: 14px;
+      font-size: 18px;
+      padding: 4px 8px;
+      border-radius: 20px;
       opacity: 0;
-      transition: opacity 0.2s;
+      transition: all 0.15s;
     }
     .script-block:hover .block-delete {
       opacity: 1;
     }
     .block-delete:hover {
-      color: #ff4466;
+      background: rgba(255,68,102,0.2);
+      color: #ff6688;
     }
 
     /* PREVIEW AREA */
@@ -259,24 +430,25 @@
       border-left: 1px solid rgba(45, 90, 227, 0.3);
       display: flex;
       flex-direction: column;
+      transition: all 0.3s;
     }
     .preview-header {
       padding: 12px 15px;
       border-bottom: 1px solid rgba(45, 90, 227, 0.3);
-      font-weight: 600;
-      font-size: 13px;
+      font-weight: 700;
+      font-size: 14px;
     }
     .game-preview {
       flex: 1;
       background: #0a0a1a;
       margin: 15px;
-      border-radius: 12px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-direction: column;
       gap: 15px;
-      border: 1px solid rgba(45, 90, 227, 0.3);
+      border: 2px solid rgba(45, 90, 227, 0.3);
     }
     .preview-placeholder {
       text-align: center;
@@ -286,14 +458,19 @@
     .test-btn {
       background: linear-gradient(135deg, #2d5ae3, #1a3bc0);
       border: none;
-      border-radius: 30px;
-      padding: 8px 20px;
+      border-radius: 40px;
+      padding: 10px 20px;
       color: white;
       cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
+      font-weight: 700;
+      font-size: 14px;
       width: calc(100% - 30px);
       margin: 0 15px 15px;
+      transition: all 0.15s;
+    }
+    .test-btn:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.1);
     }
 
     /* LIBRARY VIEW */
@@ -308,35 +485,35 @@
     }
     .games-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
       margin-top: 20px;
     }
     .game-card {
       background: rgba(20, 30, 50, 0.8);
       border: 1px solid rgba(45, 90, 227, 0.3);
-      border-radius: 14px;
-      padding: 15px;
+      border-radius: 16px;
+      padding: 18px;
       transition: all 0.2s;
       cursor: pointer;
     }
     .game-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-5px);
       border-color: #ffcc00;
     }
     .game-card h3 {
-      font-size: 15px;
+      font-size: 16px;
       margin-bottom: 6px;
     }
     .game-card p {
-      font-size: 11px;
+      font-size: 12px;
       color: rgba(255,255,255,0.5);
-      margin-bottom: 10px;
+      margin-bottom: 12px;
     }
     .game-meta {
       display: flex;
-      gap: 12px;
-      font-size: 10px;
+      gap: 15px;
+      font-size: 11px;
       color: rgba(255,255,255,0.4);
     }
 
@@ -359,20 +536,21 @@
     }
     .modal-content {
       background: rgba(20, 30, 50, 0.98);
-      border: 1px solid rgba(45, 90, 227, 0.4);
-      border-radius: 20px;
-      padding: 25px;
-      max-width: 400px;
+      border: 2px solid rgba(45, 90, 227, 0.5);
+      border-radius: 24px;
+      padding: 28px;
+      max-width: 420px;
       width: 90%;
     }
     .modal-content h3 {
       color: #ffcc00;
       margin-bottom: 15px;
+      font-size: 20px;
     }
     .modal-content input, .modal-content textarea {
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
+      padding: 12px;
+      border-radius: 12px;
       border: 1px solid rgba(45, 90, 227, 0.4);
       background: rgba(0,0,0,0.3);
       color: white;
@@ -382,7 +560,7 @@
     .beta-warning {
       background: rgba(255,68,102,0.15);
       border: 1px solid rgba(255,68,102,0.3);
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px;
       margin: 15px 0;
       font-size: 12px;
@@ -390,15 +568,15 @@
     }
     .modal-buttons {
       display: flex;
-      gap: 10px;
+      gap: 12px;
     }
     .modal-buttons button {
       flex: 1;
-      padding: 8px;
-      border-radius: 30px;
+      padding: 10px;
+      border-radius: 40px;
       border: none;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
     }
 
     /* TOAST */
@@ -408,13 +586,13 @@
       right: 20px;
       background: rgba(20, 30, 50, 0.98);
       border: 1px solid #ffcc00;
-      border-radius: 10px;
-      padding: 10px 16px;
-      font-size: 12px;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 13px;
       z-index: 10000;
-      animation: fadeIn 0.2s;
+      animation: slideIn 0.2s;
     }
-    @keyframes fadeIn {
+    @keyframes slideIn {
       from { opacity: 0; transform: translateX(40px); }
       to { opacity: 1; transform: translateX(0); }
     }
@@ -430,54 +608,72 @@
     <button class="nav-btn active" data-view="builder">🎮 BUILDER</button>
     <button class="nav-btn" data-view="library">📚 GAME LIBRARY</button>
   </div>
-  <div class="user-info">
-    <div class="user-coins" id="userCoins">🪙 0</div>
-    <div class="user-avatar" id="userAvatar">👤</div>
+  <div style="display: flex; gap: 15px; align-items: center;">
+    <button class="theme-switch" id="themeSwitchBtn">🎨 SWITCH THEME</button>
+    <div class="user-info">
+      <div class="user-coins" id="userCoins">🪙 0</div>
+      <div class="user-avatar" id="userAvatar">👤</div>
+    </div>
   </div>
 </div>
 
 <div class="container">
   <!-- BUILDER VIEW -->
   <div id="builderView" style="display: flex; width: 100%;">
-    <!-- Blocks Sidebar -->
+    <!-- Blocks Sidebar - Scratch style categories -->
     <div class="blocks-sidebar">
       <div class="block-category">
         <div class="category-title">🎮 EVENTS</div>
-        <div class="block-item" draggable="true" data-block='{"type":"event","action":"start","name":"when game starts"}'>
-          <span class="block-icon">🎬</span> when game starts
+        <div class="block-item" draggable="true" data-block='{"type":"event","action":"start","name":"when green flag clicked","icon":"🏁"}'>
+          <span class="block-icon">🏁</span> when green flag clicked
         </div>
-        <div class="block-item" draggable="true" data-block='{"type":"event","action":"click","name":"when clicked"}'>
-          <span class="block-icon">🖱️</span> when clicked
+        <div class="block-item" draggable="true" data-block='{"type":"event","action":"click","name":"when this sprite clicked","icon":"🖱️"}'>
+          <span class="block-icon">🖱️</span> when this sprite clicked
         </div>
-        <div class="block-item" draggable="true" data-block='{"type":"event","action":"key","name":"when key pressed","key":""}'>
-          <span class="block-icon">⌨️</span> when key pressed
-        </div>
-      </div>
-      <div class="block-category">
-        <div class="category-title">🎯 ACTIONS</div>
-        <div class="block-item" draggable="true" data-block='{"type":"action","action":"showText","name":"show text","text":""}'>
-          <span class="block-icon">💬</span> show text
-        </div>
-        <div class="block-item" draggable="true" data-block='{"type":"action","action":"playSound","name":"play sound","sound":""}'>
-          <span class="block-icon">🔊</span> play sound
-        </div>
-        <div class="block-item" draggable="true" data-block='{"type":"action","action":"changeScore","name":"change score","amount":"1"}'>
-          <span class="block-icon">🏆</span> change score
-        </div>
-        <div class="block-item" draggable="true" data-block='{"type":"action","action":"giveCoins","name":"give coins","amount":"10"}'>
-          <span class="block-icon">🪙</span> give coins
+        <div class="block-item" draggable="true" data-block='{"type":"event","action":"key","name":"when key pressed","icon":"⌨️","key":""}'>
+          <span class="block-icon">⌨️</span> when <input class="block-input" style="width:70px; display:inline-block;" placeholder="space" value="space"> key pressed
         </div>
       </div>
       <div class="block-category">
-        <div class="category-title">🔁 CONTROLS</div>
-        <div class="block-item" draggable="true" data-block='{"type":"control","action":"repeat","name":"repeat","times":"3"}'>
-          <span class="block-icon">🔄</span> repeat times
+        <div class="category-title">🎯 LOOKS</div>
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"say","name":"say something","icon":"💬","text":""}'>
+          <span class="block-icon">💬</span> say <input class="block-input" style="width:100px; display:inline-block;" placeholder="Hello!" value="Hello!">
         </div>
-        <div class="block-item" draggable="true" data-block='{"type":"control","action":"wait","name":"wait","seconds":"1"}'>
-          <span class="block-icon">⏱️</span> wait seconds
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"think","name":"think","icon":"🤔","text":""}'>
+          <span class="block-icon">🤔</span> think <input class="block-input" style="width:100px;" placeholder="Hmm..." value="Hmm...">
         </div>
-        <div class="block-item" draggable="true" data-block='{"type":"control","action":"if","name":"if","condition":""}'>
-          <span class="block-icon">❓</span> if condition
+      </div>
+      <div class="block-category">
+        <div class="category-title">🔊 SOUND</div>
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"playSound","name":"play sound","icon":"🔊","sound":""}'>
+          <span class="block-icon">🔊</span> play sound <input class="block-input" style="width:80px;" placeholder="pop" value="pop">
+        </div>
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"playDrum","name":"play drum","icon":"🥁","drum":""}'>
+          <span class="block-icon">🥁</span> play drum <input class="block-input" style="width:60px;" placeholder="snare" value="snare"> for <input class="block-input" style="width:50px;" placeholder="0.2" value="0.2"> beats
+        </div>
+      </div>
+      <div class="block-category">
+        <div class="category-title">🏆 VARIABLES</div>
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"changeScore","name":"change score","icon":"🏆","amount":"1"}'>
+          <span class="block-icon">🏆</span> change <select class="block-select" style="width:80px; display:inline-block;"><option>score</option><option>lives</option><option>timer</option></select> by <input class="block-input" style="width:50px;" value="1">
+        </div>
+        <div class="block-item" draggable="true" data-block='{"type":"action","action":"giveCoins","name":"give coins","icon":"🪙","amount":"10"}'>
+          <span class="block-icon">🪙</span> give <input class="block-input" style="width:50px;" value="10"> coins
+        </div>
+      </div>
+      <div class="block-category">
+        <div class="category-title">🔁 CONTROL</div>
+        <div class="block-item" draggable="true" data-block='{"type":"control","action":"repeat","name":"repeat","icon":"🔄","times":"3"}'>
+          <span class="block-icon">🔄</span> repeat <input class="block-input" style="width:50px;" value="3"> times
+        </div>
+        <div class="block-item" draggable="true" data-block='{"type":"control","action":"wait","name":"wait","icon":"⏱️","seconds":"1"}'>
+          <span class="block-icon">⏱️</span> wait <input class="block-input" style="width:50px;" value="1"> seconds
+        </div>
+        <div class="block-item" draggable="true" data-block='{"type":"control","action":"if","name":"if then","icon":"❓","condition":""}'>
+          <span class="block-icon">❓</span> if <input class="block-input" style="width:120px;" placeholder="score > 5" value="score > 5"> then
+        </div>
+        <div class="block-item" draggable="true" data-block='{"type":"control","action":"forever","name":"forever","icon":"♾️"}'>
+          <span class="block-icon">♾️</span> forever
         </div>
       </div>
     </div>
@@ -490,25 +686,25 @@
         <button class="tool-btn" id="testGameBtn">▶️ TEST GAME</button>
       </div>
       <div class="canvas" id="canvas">
-        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
-          Drag blocks here to build your game!
+        <div style="text-align: center; padding: 50px; color: rgba(255,255,255,0.4); font-size: 14px;">
+          🧩 Drag blocks from the left to build your game!
         </div>
       </div>
     </div>
 
     <!-- Preview Area -->
     <div class="preview-area">
-      <div class="preview-header">🎮 GAME PREVIEW</div>
+      <div class="preview-header">🎮 STAGE</div>
       <div class="game-preview" id="gamePreview">
         <div class="preview-placeholder">
-          <div style="font-size: 40px; margin-bottom: 10px;">🎮</div>
-          <div>Your game will appear here</div>
+          <div style="font-size: 48px; margin-bottom: 10px;">🎭</div>
+          <div>Your game will run here</div>
           <div style="font-size: 11px; margin-top: 6px;">Click TEST to play</div>
         </div>
       </div>
       <button class="test-btn" id="runTestBtn">▶️ RUN TEST</button>
       <div style="padding: 0 15px 15px; font-size: 10px; color: rgba(255,255,255,0.3); text-align: center;">
-        ⚡ BETA: Visual preview coming soon
+        💡 Pro tip: Drag blocks in any order to create logic
       </div>
     </div>
   </div>
@@ -531,7 +727,7 @@
     <textarea id="gameDesc" rows="2" placeholder="Short description (optional)"></textarea>
     <div class="beta-warning">
       ⚠️ BETA NOTICE<br>
-      Games are saved but visual preview is coming soon!
+      Games are saved and can be played in test mode!
     </div>
     <div class="modal-buttons">
       <button style="background: rgba(255,255,255,0.1); color: white;" id="cancelSaveBtn">CANCEL</button>
@@ -542,10 +738,10 @@
 
 <script>
 // ============================================================
-// FANTER STUDIOS BETA
+// FANTER STUDIOS - SCRATCH STYLE
 // ============================================================
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🎮 Fanter Studios BETA loading...');
+  console.log('🎮 Fanter Studios loading...');
 
   const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
@@ -557,6 +753,23 @@ document.addEventListener('DOMContentLoaded', function() {
     currentUser = { id: 'guest_' + Math.random().toString(36).slice(2,10), username: 'Guest', displayName: 'Guest', coins: 100 };
     localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
   }
+
+  // Theme
+  let currentTheme = localStorage.getItem('studio_theme') || 'normal';
+  function setTheme(theme) {
+    currentTheme = theme;
+    localStorage.setItem('studio_theme', theme);
+    if (theme === 'scratch') {
+      document.body.classList.add('scratch-theme');
+    } else {
+      document.body.classList.remove('scratch-theme');
+    }
+  }
+  setTheme(currentTheme);
+  document.getElementById('themeSwitchBtn').onclick = () => {
+    setTheme(currentTheme === 'normal' ? 'scratch' : 'normal');
+    toast(`🎨 Theme changed to ${currentTheme === 'scratch' ? 'Scratch' : 'Normal'} mode`);
+  };
 
   // State
   let currentGameBlocks = [];
@@ -579,7 +792,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // ============================================================
   document.querySelectorAll('.block-item').forEach(block => {
     block.addEventListener('dragstart', function(e) {
-      e.dataTransfer.setData('text/plain', JSON.stringify(JSON.parse(this.dataset.block)));
+      const blockData = JSON.parse(this.dataset.block);
+      // For blocks with inline inputs, we need to capture current values
+      const inputs = this.querySelectorAll('input, select');
+      if (inputs.length) {
+        inputs.forEach(input => {
+          if (input.placeholder) blockData[input.placeholder.toLowerCase()] = input.value;
+          else if (input.classList.contains('block-input')) {
+            if (blockData.action === 'say') blockData.text = input.value;
+            else if (blockData.action === 'think') blockData.text = input.value;
+            else if (blockData.action === 'playSound') blockData.sound = input.value;
+            else if (blockData.action === 'repeat') blockData.times = input.value;
+            else if (blockData.action === 'wait') blockData.seconds = input.value;
+            else if (blockData.action === 'changeScore') blockData.amount = input.value;
+            else if (blockData.action === 'giveCoins') blockData.amount = input.value;
+            else if (blockData.action === 'key') blockData.key = input.value;
+          }
+        });
+      }
+      e.dataTransfer.setData('text/plain', JSON.stringify(blockData));
       e.dataTransfer.effectAllowed = 'copy';
     });
   });
@@ -602,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function renderCanvas() {
     if (currentGameBlocks.length === 0) {
-      canvas.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Drag blocks here to build your game!</div>';
+      canvas.innerHTML = '<div style="text-align: center; padding: 50px; color: rgba(255,255,255,0.4); font-size: 14px;">🧩 Drag blocks from the left to build your game!</div>';
       return;
     }
 
@@ -612,53 +843,41 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="block-content">
           ${renderBlockContent(block, index)}
         </div>
-        <button class="block-delete" onclick="removeBlock(${index})">🗑</button>
+        <button class="block-delete" onclick="removeBlock(${index})">✕</button>
       </div>
     `).join('');
   }
 
   function renderBlockContent(block, index) {
-    switch(block.type) {
-      case 'event':
-        if (block.action === 'key') {
-          return `<span>⌨️ when key pressed:</span>
-                  <input class="block-input" value="${block.key || 'space'}" placeholder="key" onchange="updateBlock(${index}, 'key', this.value)">`;
-        }
-        return `<span>${block.action === 'start' ? '🎬' : '🖱️'} ${block.name}</span>`;
-      case 'action':
-        if (block.action === 'showText') {
-          return `<span>💬 show text:</span>
-                  <input class="block-input" value="${block.text || ''}" placeholder="message" onchange="updateBlock(${index}, 'text', this.value)">`;
-        }
-        if (block.action === 'playSound') {
-          return `<span>🔊 play sound:</span>
-                  <input class="block-input" value="${block.sound || 'click'}" placeholder="sound" onchange="updateBlock(${index}, 'sound', this.value)">`;
-        }
-        if (block.action === 'changeScore') {
-          return `<span>🏆 change score by:</span>
-                  <input class="block-input" value="${block.amount || '1'}" onchange="updateBlock(${index}, 'amount', this.value)">`;
-        }
-        if (block.action === 'giveCoins') {
-          return `<span>🪙 give coins:</span>
-                  <input class="block-input" value="${block.amount || '10'}" onchange="updateBlock(${index}, 'amount', this.value)">`;
-        }
-        return `<span>🎯 ${block.name}</span>`;
-      case 'control':
-        if (block.action === 'repeat') {
-          return `<span>🔄 repeat</span>
-                  <input class="block-input" value="${block.times || '3'}" style="width:50px" onchange="updateBlock(${index}, 'times', this.value)">
-                  <span>times</span>`;
-        }
-        if (block.action === 'wait') {
-          return `<span>⏱️ wait</span>
-                  <input class="block-input" value="${block.seconds || '1'}" style="width:50px" onchange="updateBlock(${index}, 'seconds', this.value)">
-                  <span>seconds</span>`;
-        }
-        if (block.action === 'if') {
-          return `<span>❓ if</span>
-                  <input class="block-input" value="${block.condition || 'score > 5'}" placeholder="condition" onchange="updateBlock(${index}, 'condition', this.value)">`;
-        }
-        return `<span>🔁 ${block.name}</span>`;
+    const icon = block.icon || (block.action === 'start' ? '🏁' : block.action === 'click' ? '🖱️' : block.action === 'say' ? '💬' : block.action === 'think' ? '🤔' : block.action === 'playSound' ? '🔊' : block.action === 'changeScore' ? '🏆' : block.action === 'giveCoins' ? '🪙' : block.action === 'repeat' ? '🔄' : block.action === 'wait' ? '⏱️' : block.action === 'if' ? '❓' : '🔷');
+    
+    switch(block.action) {
+      case 'start':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> when green flag clicked`;
+      case 'click':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> when this sprite clicked`;
+      case 'key':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> when <input class="block-input" value="${block.key || 'space'}" style="width:70px" onchange="updateBlock(${index}, 'key', this.value)"> key pressed`;
+      case 'say':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> say <input class="block-input" value="${block.text || 'Hello!'}" style="width:100px" onchange="updateBlock(${index}, 'text', this.value)">`;
+      case 'think':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> think <input class="block-input" value="${block.text || 'Hmm...'}" style="width:100px" onchange="updateBlock(${index}, 'text', this.value)">`;
+      case 'playSound':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> play sound <input class="block-input" value="${block.sound || 'pop'}" style="width:80px" onchange="updateBlock(${index}, 'sound', this.value)">`;
+      case 'playDrum':
+        return `<span style="font-size:16px; margin-right:5px;">🥁</span> play drum <input class="block-input" value="${block.drum || 'snare'}" style="width:60px" onchange="updateBlock(${index}, 'drum', this.value)"> for <input class="block-input" value="${block.beats || '0.2'}" style="width:50px" onchange="updateBlock(${index}, 'beats', this.value)"> beats`;
+      case 'changeScore':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> change <select class="block-select" style="width:80px" onchange="updateBlock(${index}, 'variable', this.value)"><option ${block.variable === 'score' ? 'selected' : ''}>score</option><option ${block.variable === 'lives' ? 'selected' : ''}>lives</option></select> by <input class="block-input" value="${block.amount || '1'}" style="width:50px" onchange="updateBlock(${index}, 'amount', this.value)">`;
+      case 'giveCoins':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> give <input class="block-input" value="${block.amount || '10'}" style="width:50px" onchange="updateBlock(${index}, 'amount', this.value)"> coins`;
+      case 'repeat':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> repeat <input class="block-input" value="${block.times || '3'}" style="width:50px" onchange="updateBlock(${index}, 'times', this.value)"> times`;
+      case 'wait':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> wait <input class="block-input" value="${block.seconds || '1'}" style="width:50px" onchange="updateBlock(${index}, 'seconds', this.value)"> seconds`;
+      case 'if':
+        return `<span style="font-size:16px; margin-right:5px;">${icon}</span> if <input class="block-input" value="${block.condition || 'score > 5'}" style="width:120px" onchange="updateBlock(${index}, 'condition', this.value)"> then`;
+      case 'forever':
+        return `<span style="font-size:16px; margin-right:5px;">♾️</span> forever`;
       default:
         return `<span>${block.name || 'block'}</span>`;
     }
@@ -667,7 +886,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.updateBlock = function(index, field, value) {
     if (currentGameBlocks[index]) {
       currentGameBlocks[index][field] = value;
-      renderCanvas();
     }
   };
 
@@ -738,7 +956,7 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   // ============================================================
-  // TEST GAME (Runner)
+  // TEST GAME
   // ============================================================
   document.getElementById('testGameBtn').onclick = runGameTest;
   document.getElementById('runTestBtn').onclick = runGameTest;
@@ -752,19 +970,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
     preview.innerHTML = `
       <div style="text-align: center; padding: 20px; width: 100%;">
-        <div style="font-size: 36px; margin-bottom: 10px;">🎮</div>
+        <div style="font-size: 40px; margin-bottom: 10px;">🎮</div>
         <div style="font-weight: bold; margin-bottom: 8px;">TEST MODE</div>
         <div style="font-size: 11px; color: rgba(255,255,255,0.5); margin-bottom: 15px;">Running your game script...</div>
-        <div id="testLog" style="background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px; text-align: left; font-size: 11px; max-height: 200px; overflow-y: auto; width: 100%;"></div>
+        <div id="testLog" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; text-align: left; font-size: 11px; max-height: 200px; overflow-y: auto; width: 100%; font-family: monospace;"></div>
       </div>
     `;
 
     const logDiv = document.getElementById('testLog');
     let score = 0;
-    let step = 0;
+    let lives = 3;
 
     function log(msg, emoji = '🟢') {
-      logDiv.innerHTML += `<div style="margin: 3px 0;">${emoji} ${msg}</div>`;
+      logDiv.innerHTML += `<div style="margin: 4px 0;">${emoji} ${msg}</div>`;
       logDiv.scrollTop = logDiv.scrollHeight;
     }
 
@@ -775,21 +993,34 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       const block = blocks[index];
-      log(`Executing: ${block.name || block.action}`, '🔷');
+      log(`→ ${block.name || block.action}`, '🔷');
 
       switch(block.action) {
-        case 'showText':
-          log(`📢 Message: "${block.text || 'Hello!'}"`);
+        case 'say':
+          log(`💬 Sprite says: "${block.text || 'Hello!'}"`);
           setTimeout(() => executeBlocks(blocks, index + 1), 500);
           break;
+        case 'think':
+          log(`🤔 Sprite thinks: "${block.text || 'Hmm...'}"`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 400);
+          break;
         case 'playSound':
-          log(`🔊 Playing sound: ${block.sound || 'click'}`);
+          log(`🔊 Playing sound: ${block.sound || 'pop'}`);
           setTimeout(() => executeBlocks(blocks, index + 1), 300);
+          break;
+        case 'playDrum':
+          log(`🥁 Playing drum: ${block.drum || 'snare'} for ${block.beats || 0.2} beats`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 200);
           break;
         case 'changeScore':
           const addScore = parseInt(block.amount) || 1;
-          score += addScore;
-          log(`🏆 Score +${addScore}! Total: ${score}`);
+          if (block.variable === 'score') {
+            score += addScore;
+            log(`🏆 Score ${addScore >= 0 ? '+' : '-'}${Math.abs(addScore)}! Total: ${score}`);
+          } else {
+            lives += addScore;
+            log(`❤️ Lives ${addScore >= 0 ? '+' : '-'}${Math.abs(addScore)}! Total: ${lives}`);
+          }
           setTimeout(() => executeBlocks(blocks, index + 1), 200);
           break;
         case 'giveCoins':
@@ -798,7 +1029,7 @@ document.addEventListener('DOMContentLoaded', function() {
           setTimeout(() => executeBlocks(blocks, index + 1), 300);
           break;
         case 'wait':
-          const waitTime = (parseInt(block.seconds) || 1) * 1000;
+          const waitTime = (parseFloat(block.seconds) || 1) * 1000;
           log(`⏱️ Waiting ${waitTime/1000} seconds...`);
           setTimeout(() => executeBlocks(blocks, index + 1), waitTime);
           break;
@@ -817,8 +1048,19 @@ document.addEventListener('DOMContentLoaded', function() {
           }
           doRepeat();
           break;
+        case 'forever':
+          log(`♾️ Forever loop started (will repeat continuously)`);
+          function doForever() {
+            setTimeout(() => {
+              log(`  ↳ Forever iteration`, '🔸');
+              doForever();
+            }, 500);
+          }
+          doForever();
+          executeBlocks(blocks, index + 1);
+          break;
         case 'if':
-          log(`❓ Checking condition: ${block.condition || 'score > 5'}`);
+          log(`❓ Checking: ${block.condition || 'score > 5'}`);
           setTimeout(() => executeBlocks(blocks, index + 1), 200);
           break;
         default:
@@ -924,17 +1166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.target === saveModal) saveModal.classList.remove('active');
   });
 
-  // Create games table if not exists (run once in SQL)
-  async function ensureTable() {
-    try {
-      await sb.from('fanter_games').select('id').limit(1);
-    } catch(e) {
-      console.log('Games table may not exist yet. Run SQL to create it.');
-    }
-  }
-  ensureTable();
-
-  console.log('🎮 Fanter Studios BETA ready! Drag blocks to create games!');
+  console.log('🎮 Fanter Studios ready! Drag blocks like Scratch!');
 });
 </script>
 </body>
