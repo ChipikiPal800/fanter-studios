@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fanter Studios (BETA) — create your own games</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, #0a0a1a, #0f0f2a, #1a0a2a);
+      color: #dde2ff;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* BETA RIBBON */
+    .beta-ribbon {
+      position: fixed;
+      top: 0;
+      right: 0;
+      z-index: 10000;
+    }
+    .beta-ribbon span {
+      display: inline-block;
+      background: linear-gradient(135deg, #ff4466, #ff8844);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 6px 20px;
+      transform: rotate(45deg) translate(25px, -15px);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* HEADER */
+    .header {
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(45, 90, 227, 0.3);
+      background: rgba(10, 15, 30, 0.8);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffcc00;
+    }
+    .logo span {
+      font-size: 12px;
+      background: rgba(255, 68, 102, 0.3);
+      color: #ff8888;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-left: 10px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+    .nav-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 30px;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: rgba(45, 90, 227, 0.2);
+      color: #ffcc00;
+    }
+    .nav-btn.active {
+      background: rgba(45, 90, 227, 0.3);
+      color: #ffcc00;
+    }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #2d5ae3, #9f5ae3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .user-coins {
+      background: rgba(0,0,0,0.3);
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 13px;
+      color: #ffcc00;
+    }
+
+    /* MAIN CONTAINER */
+    .container {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+
+    /* SIDEBAR (blocks library) */
+    .sidebar-blocks {
+      width: 280px;
+      background: rgba(10, 15, 30, 0.9);
+      border-right: 1px solid rgba(45, 90, 227, 0.3);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .block-category {
+      margin-bottom: 20px;
+    }
+    .category-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 12px;
+    }
+    .block-item {
+      background: rgba(20, 30, 50, 0.8);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .block-item:hover {
+      border-color: #ffcc00;
+      transform: translateX(3px);
+      background: rgba(45, 90, 227, 0.2);
+    }
+    .block-icon {
+      font-size: 18px;
+    }
+
+    /* CANVAS AREA (game builder) */
+    .canvas-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: rgba(5, 7, 15, 0.5);
+      position: relative;
+    }
+    .canvas-toolbar {
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(45, 90, 227, 0.3);
+      display: flex;
+      gap: 12px;
+      background: rgba(10, 15, 30, 0.8);
+    }
+    .tool-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 8px;
+      padding: 8px 16px;
+      color: white;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+    .tool-btn:hover {
+      border-color: #ffcc00;
+      transform: translateY(-2px);
+    }
+    .tool-btn.primary {
+      background: linear-gradient(135deg, #2d5ae3, #1a3bc0);
+      border-color: transparent;
+    }
+    .canvas {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .script-block {
+      background: rgba(20, 30, 50, 0.9);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .script-block:hover {
+      border-color: #ffcc00;
+      transform: translateX(5px);
+    }
+    .block-drag-handle {
+      cursor: grab;
+      color: rgba(255,255,255,0.3);
+      font-size: 16px;
+    }
+    .block-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .block-input {
+      background: rgba(0,0,0,0.3);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 6px;
+      padding: 4px 8px;
+      color: white;
+      width: 80px;
+    }
+    .block-delete {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.3);
+      cursor: pointer;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .script-block:hover .block-delete {
+      opacity: 1;
+    }
+    .block-delete:hover {
+      color: #ff4466;
+    }
+
+    /* PREVIEW AREA */
+    .preview-area {
+      width: 400px;
+      background: rgba(10, 15, 30, 0.95);
+      border-left: 1px solid rgba(45, 90, 227, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .preview-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid rgba(45, 90, 227, 0.3);
+      font-weight: 600;
+    }
+    .game-preview {
+      flex: 1;
+      background: #0a0a1a;
+      margin: 20px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 20px;
+      border: 1px solid rgba(45, 90, 227, 0.3);
+    }
+    .preview-placeholder {
+      text-align: center;
+      color: rgba(255,255,255,0.4);
+    }
+    .test-btn {
+      background: linear-gradient(135deg, #2d5ae3, #1a3bc0);
+      border: none;
+      border-radius: 30px;
+      padding: 10px 24px;
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* GAME LIBRARY */
+    .library-view {
+      display: none;
+      height: calc(100vh - 70px);
+      overflow-y: auto;
+      padding: 30px;
+    }
+    .library-view.active {
+      display: block;
+    }
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .game-card {
+      background: rgba(20, 30, 50, 0.8);
+      border: 1px solid rgba(45, 90, 227, 0.3);
+      border-radius: 16px;
+      padding: 16px;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+    .game-card:hover {
+      transform: translateY(-4px);
+      border-color: #ffcc00;
+    }
+    .game-card h3 {
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .game-card p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 12px;
+    }
+    .game-stats {
+      display: flex;
+      gap: 15px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* MODAL */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal.active {
+      display: flex;
+    }
+    .modal-content {
+      background: rgba(20, 30, 50, 0.98);
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      border-radius: 24px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-content input {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(45, 90, 227, 0.4);
+      background: rgba(0,0,0,0.3);
+      color: white;
+      margin: 15px 0;
+    }
+    .beta-warning {
+      background: rgba(255,68,102,0.15);
+      border: 1px solid rgba(255,68,102,0.3);
+      border-radius: 12px;
+      padding: 15px;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #ff8888;
+    }
+  </style>
+</head>
+<body>
+
+<div class="beta-ribbon"><span>BETA</span></div>
+
+<div class="header">
+  <div class="logo">FANTER STUDIOS <span>BETA</span></div>
+  <div class="nav-buttons">
+    <button class="nav-btn active" data-view="builder">🎮 BUILDER</button>
+    <button class="nav-btn" data-view="library">📚 GAME LIBRARY</button>
+  </div>
+  <div class="user-info">
+    <div class="user-coins" id="userCoins">🪙 0</div>
+    <div class="user-avatar" id="userAvatar">👤</div>
+  </div>
+</div>
+
+<div class="container">
+  <!-- BUILDER VIEW -->
+  <div id="builderView" style="display: flex; width: 100%;">
+    <!-- Blocks Sidebar -->
+    <div class="sidebar-blocks">
+      <div class="block-category">
+        <div class="category-title">🎮 EVENTS</div>
+        <div class="block-item" draggable="true" data-type="event" data-block='{"type":"event","name":"when game starts","action":"start"}'>
+          <span class="block-icon">🎬</span> when game starts
+        </div>
+        <div class="block-item" draggable="true" data-type="event" data-block='{"type":"event","name":"when clicked","action":"click"}'>
+          <span class="block-icon">🖱️</span> when clicked
+        </div>
+        <div class="block-item" draggable="true" data-type="event" data-block='{"type":"event","name":"when key pressed","action":"key","key":""}'>
+          <span class="block-icon">⌨️</span> when key pressed
+        </div>
+      </div>
+      <div class="block-category">
+        <div class="category-title">🎯 ACTIONS</div>
+        <div class="block-item" draggable="true" data-type="action" data-block='{"type":"action","name":"show text","action":"showText","text":""}'>
+          <span class="block-icon">💬</span> show text
+        </div>
+        <div class="block-item" draggable="true" data-type="action" data-block='{"type":"action","name":"play sound","action":"playSound","sound":""}'>
+          <span class="block-icon">🔊</span> play sound
+        </div>
+        <div class="block-item" draggable="true" data-type="action" data-block='{"type":"action","name":"move sprite","action":"moveSprite","direction":"","distance":""}'>
+          <span class="block-icon">➡️</span> move sprite
+        </div>
+        <div class="block-item" draggable="true" data-type="action" data-block='{"type":"action","name":"change score","action":"changeScore","amount":"1"}'>
+          <span class="block-icon">🏆</span> change score
+        </div>
+        <div class="block-item" draggable="true" data-type="action" data-block='{"type":"action","name":"give coins","action":"giveCoins","amount":"10"}'>
+          <span class="block-icon">🪙</span> give coins
+        </div>
+      </div>
+      <div class="block-category">
+        <div class="category-title">🔁 CONTROLS</div>
+        <div class="block-item" draggable="true" data-type="control" data-block='{"type":"control","name":"repeat","action":"repeat","times":"3"}'>
+          <span class="block-icon">🔄</span> repeat times
+        </div>
+        <div class="block-item" draggable="true" data-type="control" data-block='{"type":"control","name":"wait","action":"wait","seconds":"1"}'>
+          <span class="block-icon">⏱️</span> wait seconds
+        </div>
+        <div class="block-item" draggable="true" data-type="control" data-block='{"type":"control","name":"if","action":"if","condition":""}'>
+          <span class="block-icon">❓</span> if condition
+        </div>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-area">
+      <div class="canvas-toolbar">
+        <button class="tool-btn" id="newGameBtn">✨ NEW GAME</button>
+        <button class="tool-btn primary" id="saveGameBtn">💾 SAVE GAME</button>
+        <button class="tool-btn" id="testGameBtn">▶️ TEST GAME</button>
+      </div>
+      <div class="canvas" id="canvas">
+        <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">
+          Drag blocks here to build your game!
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview Area -->
+    <div class="preview-area">
+      <div class="preview-header">🎮 GAME PREVIEW</div>
+      <div class="game-preview" id="gamePreview">
+        <div class="preview-placeholder">
+          <div style="font-size: 48px; margin-bottom: 15px;">🎮</div>
+          <div>Your game will appear here</div>
+          <div style="font-size: 12px; margin-top: 8px;">Click TEST to play</div>
+        </div>
+      </div>
+      <div style="padding: 20px;">
+        <button class="test-btn" id="runTestBtn" style="width: 100%;">▶️ RUN TEST</button>
+      </div>
+      <div style="padding: 0 20px 20px 20px; font-size: 12px; color: rgba(255,255,255,0.3); text-align: center;">
+        ⚡ BETA: Some features still in development
+      </div>
+    </div>
+  </div>
+
+  <!-- LIBRARY VIEW -->
+  <div id="libraryView" class="library-view">
+    <h2 style="margin-bottom: 10px;">📚 COMMUNITY GAMES</h2>
+    <p style="margin-bottom: 20px; color: rgba(255,255,255,0.5);">Play games made by other Fanter users</p>
+    <div class="games-grid" id="gamesGrid">
+      <div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Loading games...</div>
+    </div>
+  </div>
+</div>
+
+<!-- SAVE MODAL -->
+<div class="modal" id="saveModal">
+  <div class="modal-content">
+    <h3>💾 Save Your Game</h3>
+    <input type="text" id="gameName" placeholder="Game name">
+    <input type="text" id="gameDesc" placeholder="Short description (optional)">
+    <div class="beta-warning">
+      ⚠️ BETA NOTICE<br>
+      Games are saved but may not run perfectly yet. This is a work in progress!
+    </div>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="tool-btn" id="confirmSaveBtn" style="flex:1;">💾 SAVE</button>
+      <button class="tool-btn" id="cancelSaveBtn" style="flex:1;">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// FANTER STUDIOS BETA
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🎮 Fanter Studios BETA loading...');
+
+  const SUPABASE_URL = "https://luxutkabqgitoteosctr.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1eHV0a2FicWdpdG90ZW9zY3RyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY2Mjc5NjAsImV4cCI6MjA5MjIwMzk2MH0.7GjvQMZaujg0YFmTBr2wotGWCIUoBWCBplGocMo6TDM";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // Current user
+  let currentUser = JSON.parse(localStorage.getItem('fanter_currentUser') || 'null');
+  if (!currentUser || !currentUser.id) {
+    currentUser = { id: 'guest_' + Math.random().toString(36).slice(2,10), username: 'Guest', displayName: 'Guest', coins: 100 };
+    localStorage.setItem('fanter_currentUser', JSON.stringify(currentUser));
+  }
+
+  // State
+  let currentGameBlocks = [];
+  let currentView = 'builder';
+  let editingGameId = null;
+
+  // DOM elements
+  const canvas = document.getElementById('canvas');
+  const gamesGrid = document.getElementById('gamesGrid');
+  const saveModal = document.getElementById('saveModal');
+  const gameNameInput = document.getElementById('gameName');
+  const gameDescInput = document.getElementById('gameDesc');
+
+  // Update user display
+  document.getElementById('userCoins').innerHTML = `🪙 ${currentUser.coins || 0}`;
+  document.getElementById('userAvatar').innerHTML = (currentUser.displayName || currentUser.username)[0].toUpperCase();
+
+  // ============================================================
+  // DRAG AND DROP
+  // ============================================================
+  document.querySelectorAll('.block-item').forEach(block => {
+    block.addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData('text/plain', JSON.stringify(JSON.parse(this.dataset.block)));
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+  });
+
+  canvas.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  });
+
+  canvas.addEventListener('drop', function(e) {
+    e.preventDefault();
+    const blockData = JSON.parse(e.dataTransfer.getData('text/plain'));
+    addBlockToCanvas(blockData);
+  });
+
+  function addBlockToCanvas(blockData) {
+    currentGameBlocks.push(blockData);
+    renderCanvas();
+  }
+
+  function renderCanvas() {
+    if (currentGameBlocks.length === 0) {
+      canvas.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Drag blocks here to build your game!</div>';
+      return;
+    }
+
+    canvas.innerHTML = currentGameBlocks.map((block, index) => `
+      <div class="script-block" data-index="${index}">
+        <div class="block-drag-handle">⋮⋮</div>
+        <div class="block-content">
+          ${renderBlockContent(block)}
+        </div>
+        <button class="block-delete" onclick="removeBlock(${index})">🗑</button>
+      </div>
+    `).join('');
+  }
+
+  function renderBlockContent(block) {
+    switch(block.type) {
+      case 'event':
+        if (block.action === 'key') {
+          return `<span>⌨️ when key pressed:</span>
+                  <input class="block-input" value="${block.key || 'space'}" placeholder="key" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'key', this.value)">`;
+        }
+        return `<span>🎬 ${block.name}</span>`;
+      case 'action':
+        if (block.action === 'showText') {
+          return `<span>💬 show text:</span>
+                  <input class="block-input" value="${block.text || ''}" placeholder="message" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'text', this.value)">`;
+        }
+        if (block.action === 'playSound') {
+          return `<span>🔊 play sound:</span>
+                  <input class="block-input" value="${block.sound || 'click'}" placeholder="sound" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'sound', this.value)">`;
+        }
+        if (block.action === 'moveSprite') {
+          return `<span>➡️ move sprite:</span>
+                  <input class="block-input" value="${block.direction || 'right'}" placeholder="direction" style="width:70px" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'direction', this.value)">
+                  <span>by</span>
+                  <input class="block-input" value="${block.distance || '10'}" placeholder="distance" style="width:50px" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'distance', this.value)">`;
+        }
+        if (block.action === 'changeScore') {
+          return `<span>🏆 change score by:</span>
+                  <input class="block-input" value="${block.amount || '1'}" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'amount', this.value)">`;
+        }
+        if (block.action === 'giveCoins') {
+          return `<span>🪙 give coins:</span>
+                  <input class="block-input" value="${block.amount || '10'}" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'amount', this.value)">`;
+        }
+        return `<span>🎯 ${block.name}</span>`;
+      case 'control':
+        if (block.action === 'repeat') {
+          return `<span>🔄 repeat</span>
+                  <input class="block-input" value="${block.times || '3'}" style="width:50px" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'times', this.value)">
+                  <span>times</span>`;
+        }
+        if (block.action === 'wait') {
+          return `<span>⏱️ wait</span>
+                  <input class="block-input" value="${block.seconds || '1'}" style="width:50px" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'seconds', this.value)">
+                  <span>seconds</span>`;
+        }
+        if (block.action === 'if') {
+          return `<span>❓ if</span>
+                  <input class="block-input" value="${block.condition || 'score > 5'}" placeholder="condition" onchange="updateBlock(${currentGameBlocks.indexOf(block)}, 'condition', this.value)">`;
+        }
+        return `<span>🔁 ${block.name}</span>`;
+      default:
+        return `<span>${block.name || 'block'}</span>`;
+    }
+  }
+
+  window.updateBlock = function(index, field, value) {
+    if (currentGameBlocks[index]) {
+      currentGameBlocks[index][field] = value;
+      renderCanvas();
+    }
+  };
+
+  window.removeBlock = function(index) {
+    currentGameBlocks.splice(index, 1);
+    renderCanvas();
+  };
+
+  // ============================================================
+  // SAVE GAME
+  // ============================================================
+  document.getElementById('saveGameBtn').onclick = () => {
+    gameNameInput.value = '';
+    gameDescInput.value = '';
+    saveModal.classList.add('active');
+  };
+
+  document.getElementById('confirmSaveBtn').onclick = async () => {
+    const name = gameNameInput.value.trim();
+    if (!name) {
+      alert('Please enter a game name');
+      return;
+    }
+
+    const gameData = {
+      name: name,
+      description: gameDescInput.value.trim(),
+      blocks: currentGameBlocks,
+      version: 'beta',
+      created_at: new Date().toISOString()
+    };
+
+    try {
+      if (editingGameId) {
+        await sb.from('fanter_games').update(gameData).eq('id', editingGameId);
+        toast('✅ Game updated!');
+      } else {
+        await sb.from('fanter_games').insert({
+          ...gameData,
+          user_id: currentUser.id,
+          username: currentUser.displayName || currentUser.username,
+          plays: 0,
+          likes: 0
+        });
+        toast('✅ Game saved!');
+      }
+      saveModal.classList.remove('active');
+      loadGames();
+    } catch(e) {
+      console.error(e);
+      toast('❌ Failed to save game');
+    }
+  };
+
+  document.getElementById('cancelSaveBtn').onclick = () => {
+    saveModal.classList.remove('active');
+  };
+
+  document.getElementById('newGameBtn').onclick = () => {
+    if (currentGameBlocks.length > 0 && confirm('Clear current game? Unsaved changes will be lost.')) {
+      currentGameBlocks = [];
+      editingGameId = null;
+      renderCanvas();
+      toast('✨ New game created');
+    }
+  };
+
+  // ============================================================
+  // TEST GAME
+  // ============================================================
+  document.getElementById('testGameBtn').onclick = runGameTest;
+  document.getElementById('runTestBtn').onclick = runGameTest;
+
+  function runGameTest() {
+    const preview = document.getElementById('gamePreview');
+    if (currentGameBlocks.length === 0) {
+      toast('⚠️ Add some blocks to your game first!');
+      return;
+    }
+
+    // Simple game runner (BETA)
+    preview.innerHTML = `
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 15px;">🎮</div>
+        <div style="font-weight: bold; margin-bottom: 10px;">TEST MODE</div>
+        <div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 20px;">Running your game script...</div>
+        <div id="testLog" style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 15px; text-align: left; font-size: 12px; max-height: 200px; overflow-y: auto;"></div>
+      </div>
+    `;
+
+    const logDiv = document.getElementById('testLog');
+    let score = 0;
+    let step = 0;
+
+    function log(msg) {
+      logDiv.innerHTML += `<div>🟢 ${msg}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    function executeBlocks(blocks, index = 0) {
+      if (index >= blocks.length) {
+        log('✅ Game script finished!');
+        return;
+      }
+
+      const block = blocks[index];
+      log(`Executing: ${block.name || block.action}`);
+
+      switch(block.action) {
+        case 'showText':
+          log(`📢 Message: "${block.text || 'Hello!'}"`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 500);
+          break;
+        case 'playSound':
+          log(`🔊 Playing sound: ${block.sound || 'click'}`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 300);
+          break;
+        case 'changeScore':
+          score += parseInt(block.amount) || 1;
+          log(`🏆 Score increased! Total score: ${score}`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 200);
+          break;
+        case 'giveCoins':
+          log(`🪙 You earned ${block.amount || 10} coins!`);
+          setTimeout(() => executeBlocks(blocks, index + 1), 300);
+          break;
+        case 'wait':
+          const waitTime = (parseInt(block.seconds) || 1) * 1000;
+          log(`⏱️ Waiting ${waitTime/1000} seconds...`);
+          setTimeout(() => executeBlocks(blocks, index + 1), waitTime);
+          break;
+        case 'repeat':
+          const times = parseInt(block.times) || 3;
+          log(`🔄 Repeating ${times} times...`);
+          let repeatCount = 0;
+          function doRepeat() {
+            if (repeatCount < times) {
+              log(`  ↳ Repeat #${repeatCount + 1}`);
+              repeatCount++;
+              setTimeout(doRepeat, 300);
+            } else {
+              executeBlocks(blocks, index + 1);
+            }
+          }
+          doRepeat();
+          break;
+        default:
+          setTimeout(() => executeBlocks(blocks, index + 1), 200);
+      }
+    }
+
+    log(`🎮 Starting game test...`);
+    log(`📦 ${currentGameBlocks.length} blocks loaded`);
+    executeBlocks(currentGameBlocks);
+  }
+
+  // ============================================================
+  // GAME LIBRARY
+  // ============================================================
+  async function loadGames() {
+    try {
+      const { data } = await sb.from('fanter_games').select('*').order('created_at', { ascending: false }).limit(30);
+      if (!data || data.length === 0) {
+        gamesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">No games yet. Be the first to create one!</div>';
+        return;
+      }
+      gamesGrid.innerHTML = data.map(game => `
+        <div class="game-card" onclick="loadGameToEdit('${game.id}')">
+          <h3>${escapeHtml(game.name)}</h3>
+          <p>${escapeHtml(game.description || 'No description')}</p>
+          <div class="game-stats">
+            <span>👤 ${escapeHtml(game.username || 'Unknown')}</span>
+            <span>▶️ ${game.plays || 0} plays</span>
+            <span>❤️ ${game.likes || 0} likes</span>
+          </div>
+        </div>
+      `).join('');
+    } catch(e) {
+      console.error(e);
+      gamesGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">Error loading games</div>';
+    }
+  }
+
+  window.loadGameToEdit = async function(gameId) {
+    try {
+      const { data } = await sb.from('fanter_games').select('*').eq('id', gameId).single();
+      if (data) {
+        currentGameBlocks = data.blocks || [];
+        editingGameId = gameId;
+        renderCanvas();
+        switchView('builder');
+        toast(`📂 Loaded: ${data.name}`);
+      }
+    } catch(e) {
+      console.error(e);
+      toast('❌ Failed to load game');
+    }
+  };
+
+  // ============================================================
+  // VIEW SWITCHING
+  // ============================================================
+  function switchView(view) {
+    currentView = view;
+    const builderView = document.getElementById('builderView');
+    const libraryView = document.getElementById('libraryView');
+    const navBtns = document.querySelectorAll('.nav-btn');
+
+    if (view === 'builder') {
+      builderView.style.display = 'flex';
+      libraryView.classList.remove('active');
+    } else {
+      builderView.style.display = 'none';
+      libraryView.classList.add('active');
+      loadGames();
+    }
+
+    navBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.view === view);
+    });
+  }
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.onclick = () => switchView(btn.dataset.view);
+  });
+
+  // ============================================================
+  // UTILITIES
+  // ============================================================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]);
+  }
+
+  function toast(msg) {
+    const tc = document.getElementById('toastContainer');
+    if (!tc) {
+      const div = document.createElement('div');
+      div.id = 'toastContainer';
+      div.style.cssText = 'position:fixed;bottom:20px;right:20px;z-index:10000';
+      document.body.appendChild(div);
+    }
+    const el = document.createElement('div');
+    el.style.cssText = 'background:rgba(20,30,50,0.98);border:1px solid #ffcc00;border-radius:10px;padding:10px 16px;font-size:12px;margin-top:8px;animation:fadeIn 0.2s';
+    el.innerHTML = msg;
+    document.getElementById('toastContainer').appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
+
+  // Close modal on outside click
+  saveModal.addEventListener('click', (e) => {
+    if (e.target === saveModal) saveModal.classList.remove('active');
+  });
+
+  // Create games table if not exists (run once in SQL)
+  async function ensureTable() {
+    try {
+      await sb.from('fanter_games').select('id').limit(1);
+    } catch(e) {
+      console.log('Games table may not exist yet. Run SQL to create it.');
+    }
+  }
+  ensureTable();
+
+  console.log('🎮 Fanter Studios BETA ready!');
+});
+</script>
+
+</body>
+</html>
