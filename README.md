@@ -1,1 +1,1 @@
-# fanter-studios
+fanters lightweight version of Scratch.
